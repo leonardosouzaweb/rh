@@ -1,0 +1,22 @@
+# Habilita o módulo de reescrita
+RewriteEngine On
+
+# Define o diretório base (ajuste se o projeto estiver em subpasta)
+RewriteBase /rh
+
+# Redireciona URLs amigáveis para os arquivos PHP correspondentes
+RewriteRule ^dashboard/?$ dashboard.php [L,QSA]
+RewriteRule ^demografico/?$ demografico.php [L,QSA]
+RewriteRule ^headcount/?$ headcount.php [L,QSA]
+RewriteRule ^absenteismo/?$ absenteismo.php [L,QSA]
+RewriteRule ^construtor/?$ construtor.php [L,QSA]
+RewriteRule ^configuracoes/?$ configuracoes.php [L,QSA]
+RewriteRule ^graficos/?$ graficos.php [L,QSA]
+RewriteRule ^perfil/?$ perfil.php [L,QSA]
+RewriteRule ^relatorios/?$ relatorios.php [L,QSA]
+RewriteRule ^logout/?$ logout.php [L,QSA]
+RewriteRule ^$ index.php [L,QSA]
+
+# Garante que arquivos reais (CSS, JS, imagens etc.) não sejam reescritos
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d

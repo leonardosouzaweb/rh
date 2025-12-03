@@ -1,0 +1,13 @@
+[02-Dec-2025 23:42:59 America/Sao_Paulo] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'artesanal.desligamentos' doesn't exist in /Applications/MAMP/htdocs/rh/includes/functions/funcGraphHeadcount.php:310
+Stack trace:
+#0 /Applications/MAMP/htdocs/rh/includes/functions/funcGraphHeadcount.php(310): PDO->query('SELECT mes, vin...')
+#1 /Applications/MAMP/htdocs/rh/includes/functions/funcGraphHeadcount.php(67): calcularDesligamentosHeadcount(Object(PDO), Array)
+#2 /Applications/MAMP/htdocs/rh/includes/graphs/headcount.php(63): gerarDadosHeadcount(Object(PDO), 'headcount_desli...', Array, 'quantidade')
+#3 /Applications/MAMP/htdocs/rh/headcount.php(66): require_once('/Applications/M...')
+#4 {main}
+  thrown in /Applications/MAMP/htdocs/rh/includes/functions/funcGraphHeadcount.php on line 310
+[03-Dec-2025 00:03:39 America/Sao_Paulo] PHP Warning:  Undefined array key "valores" in /Applications/MAMP/htdocs/rh/includes/footer/footerDemografico.php on line 21
+[03-Dec-2025 00:03:42 America/Sao_Paulo] PHP Warning:  Undefined array key "valores" in /Applications/MAMP/htdocs/rh/includes/footer/footerDemografico.php on line 21
+[03-Dec-2025 00:03:47 America/Sao_Paulo] PHP Warning:  Undefined array key "valores" in /Applications/MAMP/htdocs/rh/includes/footer/footerDemografico.php on line 21
+[03-Dec-2025 00:04:26 America/Sao_Paulo] PHP Warning:  Undefined array key "valores" in /Applications/MAMP/htdocs/rh/includes/footer/footerDemografico.php on line 21
+[03-Dec-2025 00:04:42 America/Sao_Paulo] PHP Warning:  Undefined array key "valores" in /Applications/MAMP/htdocs/rh/includes/footer/footerDemografico.php on line 21
