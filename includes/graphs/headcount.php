@@ -10,7 +10,7 @@ $graficosHeadcount = [
     [
         'titulo'     => 'Headcount - Gestor vs Não Gestor',
         'campo'      => 'headcount_lideranca',
-        'tipo'       => 'line',
+        'tipo'       => 'bar',
         'formato'    => 'numero',
         'orientacao' => 'horizontal'
     ],

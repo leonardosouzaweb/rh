@@ -237,18 +237,12 @@ function calcularHeadcountLideranca(PDO $pdo, array $filtros): array
                 'data' => $dados['Gestor'],
                 'borderColor' => '#1374a5',
                 'backgroundColor' => '#1374a5',
-                'tension' => 0.3,
-                'fill' => false,
-                'yAxisID' => 'y1'
             ],
             [
                 'label' => 'Não Gestor',
                 'data' => $dados['Não Gestor'],
                 'borderColor' => '#ff7900',
                 'backgroundColor' => '#ff7900',
-                'tension' => 0.3,
-                'fill' => false,
-                'yAxisID' => 'y2'
             ]
         ]
     ];
