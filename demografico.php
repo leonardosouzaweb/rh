@@ -100,7 +100,7 @@ require_once __DIR__ . '/includes/graphs/demografico.php';
       <div><i class="ph ph-users-four text-5xl text-[#f78e23]"></i></div>
       <div class="text-left">
         <span class="text-sm text-gray-400 block">Headcount</span>
-        <h3 class="text-4xl font-bold"><?= $headcount ?></h3>
+        <h3 class="text-4xl font-bold"><?= empty($filtros['mes']) ? '–' : $headcount ?></h3>
       </div>
     </div>
 
@@ -108,7 +108,7 @@ require_once __DIR__ . '/includes/graphs/demografico.php';
       <div><i class="ph ph-user-gear text-5xl text-[#f78e23]"></i></div>
       <div class="text-left">
         <span class="text-sm text-gray-400 block">Liderança</span>
-        <h3 class="text-4xl font-bold"><?= $lideranca ?></h3>
+        <h3 class="text-4xl font-bold"><?= empty($filtros['mes']) ? '–' : $lideranca ?></h3>
       </div>
     </div>
 
@@ -116,7 +116,7 @@ require_once __DIR__ . '/includes/graphs/demografico.php';
       <div><i class="ph ph-users text-5xl text-[#f78e23]"></i></div>
       <div class="text-left">
         <span class="text-sm text-gray-400 block">Liderados</span>
-        <h3 class="text-4xl font-bold"><?= $liderados ?></h3>
+        <h3 class="text-4xl font-bold"><?= empty($filtros['mes']) ? '–' : $liderados ?></h3>
       </div>
     </div>
 
@@ -124,7 +124,7 @@ require_once __DIR__ . '/includes/graphs/demografico.php';
       <div><i class="ph ph-hourglass text-5xl text-[#f78e23]"></i></div>
       <div class="text-left">
         <span class="text-sm text-gray-400 block">Média de Idade</span>
-        <h3 class="text-4xl font-bold"><?= $mediaIdade ?></h3>
+        <h3 class="text-4xl font-bold"><?= empty($filtros['mes']) ? '–' : $mediaIdade ?></h3>
       </div>
     </div>
 
@@ -132,7 +132,7 @@ require_once __DIR__ . '/includes/graphs/demografico.php';
       <div><i class="ph ph-calendar text-5xl text-[#f78e23]"></i></div>
       <div class="text-left">
         <span class="text-sm text-gray-400 block">Média Tempo de Casa</span>
-        <h3 class="text-4xl font-bold"><?= $mediaTempo ?></h3>
+        <h3 class="text-4xl font-bold"><?= empty($filtros['mes']) ? '–' : $mediaTempo ?></h3>
       </div>
     </div>
 
@@ -140,7 +140,7 @@ require_once __DIR__ . '/includes/graphs/demografico.php';
       <div><i class="ph ph-users-three text-5xl text-[#f78e23]"></i></div>
       <div class="text-left">
         <span class="text-sm text-gray-400 block">Colaborador/Gestor</span>
-        <h3 class="text-4xl font-bold"><?= $mediaPorGestor ?></h3>
+        <h3 class="text-4xl font-bold"><?= empty($filtros['mes']) ? '–' : $mediaPorGestor ?></h3>
       </div>
     </div>
 

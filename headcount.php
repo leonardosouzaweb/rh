@@ -234,6 +234,90 @@ $filtrosConfig = [
       </section>
     <?php endforeach; ?>
   </div>
+
+  <div>
+    <?php foreach ([8] as $i): $g = $graficosHeadcount[$i]; ?>
+      <section class="<?= $i === 4 ? 'lg:col-span-6' : 'lg:col-span-6' ?>">
+        <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition p-6">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-semibold"><?= $g['titulo'] ?></h3>
+            <div class="flex items-center gap-2">
+              <button type="button"
+                class="btn btn-ghost btn-xs text-gray-500 hover:text-[#f78e23] baixarGrafico"
+                data-grafico="<?= $i ?>"
+                title="Baixar gráfico">
+                <i class="ph ph-download-simple text-lg"></i>
+              </button>
+              <select class="select select-sm select-bordered tipoGrafico" data-grafico="<?= $i ?>">
+                <option value="bar" <?= $g['tipo'] === 'bar' ? 'selected' : '' ?>>Barras</option>
+                <option value="pie" <?= $g['tipo'] === 'pie' ? 'selected' : '' ?>>Pizza</option>
+                <option value="doughnut" <?= $g['tipo'] === 'doughnut' ? 'selected' : '' ?>>Rosca</option>
+                <option value="line" <?= $g['tipo'] === 'line' ? 'selected' : '' ?>>Linha</option>
+              </select>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <canvas id="grafico<?= $i ?>" style="margin-bottom:15px; height:300px;"></canvas>
+        </div>
+      </section>
+    <?php endforeach; ?>
+  </div>
+
+  <div>
+    <?php foreach ([9] as $i): $g = $graficosHeadcount[$i]; ?>
+      <section class="<?= $i === 4 ? 'lg:col-span-6' : 'lg:col-span-6' ?>">
+        <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition p-6">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-semibold"><?= $g['titulo'] ?></h3>
+            <div class="flex items-center gap-2">
+              <button type="button"
+                class="btn btn-ghost btn-xs text-gray-500 hover:text-[#f78e23] baixarGrafico"
+                data-grafico="<?= $i ?>"
+                title="Baixar gráfico">
+                <i class="ph ph-download-simple text-lg"></i>
+              </button>
+              <select class="select select-sm select-bordered tipoGrafico" data-grafico="<?= $i ?>">
+                <option value="bar" <?= $g['tipo'] === 'bar' ? 'selected' : '' ?>>Barras</option>
+                <option value="pie" <?= $g['tipo'] === 'pie' ? 'selected' : '' ?>>Pizza</option>
+                <option value="doughnut" <?= $g['tipo'] === 'doughnut' ? 'selected' : '' ?>>Rosca</option>
+                <option value="line" <?= $g['tipo'] === 'line' ? 'selected' : '' ?>>Linha</option>
+              </select>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <canvas id="grafico<?= $i ?>" style="margin-bottom:15px; height:300px;"></canvas>
+        </div>
+      </section>
+    <?php endforeach; ?>
+  </div>
+
+  <div>
+    <?php foreach ([10] as $i): $g = $graficosHeadcount[$i]; ?>
+      <section class="<?= $i === 4 ? 'lg:col-span-6' : 'lg:col-span-6' ?>">
+        <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition p-6">
+          <div class="flex justify-between items-center">
+            <h3 class="text-lg font-semibold"><?= $g['titulo'] ?></h3>
+            <div class="flex items-center gap-2">
+              <button type="button"
+                class="btn btn-ghost btn-xs text-gray-500 hover:text-[#f78e23] baixarGrafico"
+                data-grafico="<?= $i ?>"
+                title="Baixar gráfico">
+                <i class="ph ph-download-simple text-lg"></i>
+              </button>
+              <select class="select select-sm select-bordered tipoGrafico" data-grafico="<?= $i ?>">
+                <option value="bar" <?= $g['tipo'] === 'bar' ? 'selected' : '' ?>>Barras</option>
+                <option value="pie" <?= $g['tipo'] === 'pie' ? 'selected' : '' ?>>Pizza</option>
+                <option value="doughnut" <?= $g['tipo'] === 'doughnut' ? 'selected' : '' ?>>Rosca</option>
+                <option value="line" <?= $g['tipo'] === 'line' ? 'selected' : '' ?>>Linha</option>
+              </select>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <canvas id="grafico<?= $i ?>" style="margin-bottom:15px; height:300px;"></canvas>
+        </div>
+      </section>
+    <?php endforeach; ?>
+  </div>
 </main>
 
 <?php include __DIR__ . '/includes/footer/footerHeadcount.php'; ?>

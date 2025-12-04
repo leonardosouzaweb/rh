@@ -56,6 +56,28 @@ $graficosHeadcount = [
         'formato'    => 'percentual',
         'orientacao' => 'horizontal'
     ],
+    [
+        'titulo'     => 'Desligamentos por Tipo (Voluntário x Involuntário)',
+        'campo'      => 'desligamentos_tipo',
+        'tipo'       => 'bar',
+        'formato'    => 'numero',
+        'orientacao' => 'horizontal'
+    ],
+    [
+        'titulo'     => 'Headcount por Diretoria e Vínculo',
+        'campo'      => 'headcount_area_vinculo',
+        'tipo'       => 'bar',
+        'formato'    => 'numero',
+        'orientacao' => 'horizontal'
+    ],
+
+    [
+        'titulo'     => 'Admitidos x Desligados por Mês',
+        'campo'      => 'admitidos_desligados',
+        'tipo'       => 'line',
+        'formato'    => 'numero',
+        'orientacao' => 'horizontal'
+    ],
 ];
 
 foreach ($graficosHeadcount as &$g) {
