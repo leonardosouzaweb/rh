@@ -115,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 
   <!-- Um único formulário -->
-  <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+  <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 xl:grid-cols-[25%_75%] gap-6">
 
     <!-- Coluna esquerda -->
     <section class="bg-base-100 rounded-2xl shadow-md border border-base-300 p-6 flex flex-col justify-center items-center text-center min-h-[445px]">

@@ -64,12 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['arquivo'])) {
     fgetcsv($handle, 0, $delimitador);
     $processadas = 0;
 
-    function converterMes($valor) {
+function converterMes($valor) {
     if (!$valor) return '';
 
     $valor = strtolower(trim($valor));
 
-    // Mapas aceitos
+    // Mapa de meses
     $mapa = [
         'jan.' => '01', 'janeiro' => '01',
         'fev.' => '02', 'fevereiro' => '02',
@@ -85,24 +85,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['arquivo'])) {
         'dez.' => '12', 'dezembro' => '12'
     ];
 
-    // Ex: jan.-24
-    if (preg_match('/([a-z\.]+)-(\d{2})/i', $valor, $m)) {
-        $mes = $m[1];
+    // Caso venha no padrão: nov.-25
+    if (preg_match('/([a-z\.]+)-(\d{2})$/i', $valor, $m)) {
+        $mesTxt = $m[1];
         $ano = '20' . $m[2];
-        $numMes = $mapa[$mes] ?? null;
-        if ($numMes) return "$numMes/$ano";
+        $numMes = $mapa[$mesTxt] ?? null;
+        if ($numMes) return "01/$numMes/$ano";
     }
 
-    // Ex: janeiro-2024
-    if (preg_match('/([a-zç]+)-(\d{4})/i', $valor, $m)) {
-        $mes = $m[1];
+    // Caso venha no padrão: janeiro-2024
+    if (preg_match('/([a-zç]+)-(\d{4})$/i', $valor, $m)) {
+        $mesTxt = $m[1];
         $ano = $m[2];
-        $numMes = $mapa[$mes] ?? null;
-        if ($numMes) return "$numMes/$ano";
+        $numMes = $mapa[$mesTxt] ?? null;
+        if ($numMes) return "01/$numMes/$ano";
+    }
+
+    // Caso venha apenas o nome do mês: "novembro"
+    if (isset($mapa[$valor])) {
+        $numMes = $mapa[$valor];
+        $anoAtual = date('Y');
+        return "01/$numMes/$anoAtual";
     }
 
     return $valor;
 }
+
 
 while (($linha = fgetcsv($handle, 0, $delimitador)) !== false) {
     $linha = array_map(fn($v) => trim($v ?? ''), $linha);
@@ -214,7 +222,8 @@ $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </script>
   <?php endif; ?>
 
-  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+  <div class="grid grid-cols-1 xl:grid-cols-[30%_70%] gap-6">
+
     <!-- Upload CSV -->
     <section class="bg-base-100 rounded-2xl shadow-md border border-base-300 p-6 flex flex-col justify-between h-full">
       <div class="flex flex-col flex-grow justify-center">
@@ -284,15 +293,15 @@ $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <td class="flex gap-2 justify-end">
                       <button class="btn btn-sm btn-outline btn-primary verTabela flex items-center gap-1"
                         data-tabela="<?= htmlspecialchars($l['tabela_criada']) ?>">
-                        <i class="ph ph-eye"></i> Ver
+                        <i class="ph ph-eye"></i> 
                       </button>
                       <a href="uploads/<?= urlencode($l['nome_arquivo']) ?>" download
                         class="btn btn-sm btn-outline btn-accent flex items-center gap-1">
-                        <i class="ph ph-download-simple"></i> Baixar
+                        <i class="ph ph-download-simple"></i> 
                       </a>
                       <button class="btn btn-sm btn-outline btn-error deletarTabela flex items-center gap-1"
                         data-tabela="<?= htmlspecialchars($l['tabela_criada']) ?>">
-                        <i class="ph ph-trash"></i> Excluir
+                        <i class="ph ph-trash"></i> 
                       </button>
                     </td>
                   </tr>

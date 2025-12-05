@@ -15,10 +15,7 @@
   <!-- Header do Dashboard -->
   <div class="flex items-center justify-between mb-8">
     <div>
-      <h1 class="text-4xl font-bold text-gray-800 mb-2 flex items-center gap-3">
-        <i class="ph ph-gauge text-[#f78e23]"></i>
-        Dashboard
-      </h1>
+      <h1 class="text-4xl font-bold text-gray-800 mb-2 flex items-center gap-3">Dashboard</h1>
       <p class="text-gray-500">Visão geral dos indicadores de RH</p>
     </div>
     <div class="text-right">

@@ -1,4 +1,4 @@
-<footer class="w-full mt-10 p-4 text-left text-gray-500 text-sm border-t border-gray-200 fixed bottom-5">
+<footer class="w-full mt-10 p-5 text-left text-gray-500 text-sm border-t border-gray-200 fixed">
   <p>© <?= date('Y') ?> Artesanal Investimentos — Todos os direitos reservados.</p>
 
 <button id="supportButton"
@@ -31,17 +31,14 @@
   const cancelSupport = document.getElementById('cancelSupport');
   const supportForm = document.getElementById('supportForm');
 
-  // Abrir modal
   supportButton.addEventListener('click', () => {
     supportModal.showModal();
   });
 
-  // Fechar modal
   cancelSupport.addEventListener('click', () => {
     supportModal.close();
   });
 
-  // Envio de mensagem (pode futuramente ser integrado com backend/email)
   supportForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const nome = document.getElementById('supportName').value.trim();
@@ -52,6 +49,5 @@
 
     supportModal.close();
     supportForm.reset();
-    alert('Mensagem enviada com sucesso! Nossa equipe retornará em breve.');
   });
 </script>

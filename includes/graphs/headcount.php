@@ -70,7 +70,6 @@ $graficosHeadcount = [
         'formato'    => 'numero',
         'orientacao' => 'horizontal'
     ],
-
     [
         'titulo'     => 'Admitidos x Desligados por Mês',
         'campo'      => 'admitidos_desligados',

@@ -272,7 +272,6 @@ function calcularAdmissoesHeadcount(PDO $pdo, array $filtros): array
         $p = parseMesBanco($r['mes']);
         if (!$p) continue;
 
-        // Apenas ano atual (ajuste conforme quiser)
         if ((int)$p['ano'] < date('Y')) continue;
 
         $labels[$p['key']] = $p['label'];
@@ -283,7 +282,7 @@ function calcularAdmissoesHeadcount(PDO $pdo, array $filtros): array
         $dadosPorMes[$v][$p['key']] = (int)$r['total'];
     }
 
-    ksort($labels); // ordenação perfeita ano+mes
+    ksort($labels);
     $keysOrdenados = array_keys($labels);
     $labelsOrdenados = array_values($labels);
 
@@ -354,12 +353,6 @@ function calcularDesligamentosHeadcount(PDO $pdo, array $filtros): array
     ];
 }
 
-
-
-
-
-
-
 function calcularTurnoverHeadcount(PDO $pdo): array
 {
     $ordemMeses = [
@@ -367,7 +360,6 @@ function calcularTurnoverHeadcount(PDO $pdo): array
         'julho','agosto','setembro','outubro','novembro','dezembro'
     ];
 
-    // Carregar tabelas reais na ordem correta
     $tabelas = [];
     $stmt = $pdo->query("SHOW TABLES");
     while ($t = $stmt->fetchColumn()) {
@@ -382,35 +374,21 @@ function calcularTurnoverHeadcount(PDO $pdo): array
 
     foreach ($tabelas as $tabela) {
 
-        // HC FINAL — colaboradores ativos no mês (apenas informação auxiliar)
         $hcFinal = (int)$pdo->query("
             SELECT COUNT(*) 
             FROM `$tabela` 
             WHERE LOWER(statusmes) = 'ativo'
         ")->fetchColumn();
 
-        // TOTAL desligados do mês
         $desligamentos = (int)$pdo->query("
             SELECT COUNT(*) 
             FROM `$tabela` 
             WHERE LOWER(statusmes) = 'desligado'
         ")->fetchColumn();
 
-        /**
-         * NOVA REGRA DE HC INICIAL (para qualquer mês):
-         * HC Inicial(M) = COUNT(
-         *   registros com statusmes = 'ativo' ou 'desligado'
-         *   E (dataadmissao = '' OU dataadmissao <= último dia do mês ANTERIOR)
-         * )
-         * Ou seja, somente quem já estava na empresa antes do mês começar.
-         */
-
-        // Descobre o número do mês atual baseado na posição em $ordemMeses
         $numMes = array_search($tabela, $ordemMeses) + 1;
 
-        // Último dia do mês ANTERIOR ao mês da tabela
         if ($numMes === 1) {
-            // Janeiro: considera colaboradores admitidos até 31/12 do ano anterior
             $ultimoDiaMesAnterior = '2024-12-31';
         } else {
             $ultimoDiaMesAnterior = date(
@@ -419,7 +397,6 @@ function calcularTurnoverHeadcount(PDO $pdo): array
             );
         }
 
-        // HC INICIAL com a nova regra do RH
         $sqlHCInicial = "
             SELECT COUNT(*)
             FROM `$tabela`
@@ -436,7 +413,6 @@ function calcularTurnoverHeadcount(PDO $pdo): array
             $hcInicial = 1;
         }
 
-        // Cálculo do turnover
         $turnover = $hcInicial > 0
             ? round(($desligamentos / $hcInicial) * 100, 2)
             : 0;
@@ -466,7 +442,6 @@ function calcularTurnoverAcumuladoHeadcount(PDO $pdo): array
         'julho','agosto','setembro','outubro','novembro','dezembro'
     ];
 
-    // Capturar tabelas reais de meses
     $tabelas = [];
     $stmt = $pdo->query("SHOW TABLES");
     while ($t = $stmt->fetchColumn()) {
@@ -483,12 +458,9 @@ function calcularTurnoverAcumuladoHeadcount(PDO $pdo): array
     $numMeses = count($tabelas);
 
     foreach ($tabelas as $tabela) {
-
-        // 1. Definir mês numérico
         $numMes = array_search($tabela, $ordemMeses) + 1;
         $primeiroDia = sprintf("2025-%02d-01", $numMes);
 
-        // 2. HC Inicial
         $sqlHCInicial = "
             SELECT COUNT(*)
             FROM `$tabela`
@@ -503,7 +475,6 @@ function calcularTurnoverAcumuladoHeadcount(PDO $pdo): array
 
         $somaHCInicial += $hcInicial;
 
-        // 3. Total de desligamentos (vol + inv)
         $sqlDesl = "
             SELECT COUNT(*)
             FROM `$tabela`
@@ -512,10 +483,7 @@ function calcularTurnoverAcumuladoHeadcount(PDO $pdo): array
         $totalDesligamentos += (int)$pdo->query($sqlDesl)->fetchColumn();
     }
 
-    // 4. Média de HC Inicial
     $mediaHCInicial = $somaHCInicial / $numMeses;
-
-    // 5. Turnover acumulado — sem divisão por 2
     $turnAcumulado = round(($totalDesligamentos / $mediaHCInicial) * 100, 2);
 
     return [
@@ -538,7 +506,6 @@ function calcularTurnoverVoluntarioHeadcount(PDO $pdo): array
         'julho','agosto','setembro','outubro','novembro','dezembro'
     ];
 
-    // Encontrar tabelas dos meses
     $tabelas = [];
     $stmt = $pdo->query("SHOW TABLES");
     while ($t = $stmt->fetchColumn()) {
@@ -554,17 +521,8 @@ function calcularTurnoverVoluntarioHeadcount(PDO $pdo): array
     $valores = [];
 
     foreach ($tabelas as $index => $tabela) {
-
-        // ---------------------------------------------------------------
-        // 1. DEFINIR PRIMEIRO DIA DO MÊS (2025)
-        // ---------------------------------------------------------------
         $numMes = array_search($tabela, $ordemMeses) + 1;
         $primeiroDia = sprintf("2025-%02d-01", $numMes);
-
-        // ---------------------------------------------------------------
-        // 2. CALCULAR HC INICIAL DO MÊS
-        //    Contar todos que já estavam antes do mês
-        // ---------------------------------------------------------------
         $sqlHCInicial = "
     SELECT COUNT(*)
     FROM `$tabela`
@@ -580,13 +538,9 @@ function calcularTurnoverVoluntarioHeadcount(PDO $pdo): array
 
         $hcInicial = (int)$pdo->query($sqlHCInicial)->fetchColumn();
         if ($hcInicial <= 0) {
-            $hcInicial = 1; // evita divisão por zero
+            $hcInicial = 1;
         }
 
-        // ---------------------------------------------------------------
-        // 3. CONTAR DESLIGAMENTOS VOLUNTÁRIOS DO MÊS
-        //    turnover = 'Voluntário'
-        // ---------------------------------------------------------------
         $sqlVoluntarios = "
             SELECT COUNT(*)
             FROM `$tabela`
@@ -594,10 +548,6 @@ function calcularTurnoverVoluntarioHeadcount(PDO $pdo): array
         ";
 
         $voluntarios = (int)$pdo->query($sqlVoluntarios)->fetchColumn();
-
-        // ---------------------------------------------------------------
-        // 4. CALCULAR TURNOVER VOLUNTÁRIO
-        // ---------------------------------------------------------------
         $turnVol = round(($voluntarios / $hcInicial) * 100, 2);
 
         $labels[] = ucfirst($tabela);
@@ -627,7 +577,6 @@ function calcularTurnoverInvoluntarioHeadcount(PDO $pdo): array
         'julho','agosto','setembro','outubro','novembro','dezembro'
     ];
 
-    // Encontrar tabelas de meses
     $tabelas = [];
     $stmt = $pdo->query("SHOW TABLES");
     while ($t = $stmt->fetchColumn()) {
@@ -643,16 +592,8 @@ function calcularTurnoverInvoluntarioHeadcount(PDO $pdo): array
     $valores = [];
 
     foreach ($tabelas as $index => $tabela) {
-
-        // ---------------------------------------------------------------
-        // 1. DEFINIR PRIMEIRO DIA DO MÊS (2025)
-        // ---------------------------------------------------------------
         $numMes = array_search($tabela, $ordemMeses) + 1;
         $primeiroDia = sprintf("2025-%02d-01", $numMes);
-
-        // ---------------------------------------------------------------
-        // 2. CALCULAR HC INICIAL DO MÊS
-        // ---------------------------------------------------------------
         $sqlHCInicial = "
             SELECT COUNT(*)
             FROM `$tabela`
@@ -666,12 +607,9 @@ function calcularTurnoverInvoluntarioHeadcount(PDO $pdo): array
 
         $hcInicial = (int)$pdo->query($sqlHCInicial)->fetchColumn();
         if ($hcInicial <= 0) {
-            $hcInicial = 1; // evita divisão por zero
+            $hcInicial = 1;
         }
 
-        // ---------------------------------------------------------------
-        // 3. CONTAR DESLIGAMENTOS INVOLUNTÁRIOS
-        // ---------------------------------------------------------------
         $sqlInvoluntarios = "
             SELECT COUNT(*)
             FROM `$tabela`
@@ -679,10 +617,6 @@ function calcularTurnoverInvoluntarioHeadcount(PDO $pdo): array
         ";
 
         $involuntarios = (int)$pdo->query($sqlInvoluntarios)->fetchColumn();
-
-        // ---------------------------------------------------------------
-        // 4. CALCULAR TURNOVER INVOLUNTÁRIO
-        // ---------------------------------------------------------------
         $turnInv = round(($involuntarios / $hcInicial) * 100, 2);
 
         $labels[] = ucfirst($tabela);
@@ -725,11 +659,8 @@ function calcularDesligamentosPorTipo(PDO $pdo): array
     $involuntarios = [];
 
     foreach ($tabelas as $tabela) {
-
-        // Nome amigável do mês
         $labels[] = ucfirst($tabela);
 
-        // Voluntário
         $vol = (int)$pdo->query("
             SELECT COUNT(*)
             FROM `$tabela`
@@ -737,7 +668,6 @@ function calcularDesligamentosPorTipo(PDO $pdo): array
               AND LOWER(turnover) = 'voluntário'
         ")->fetchColumn();
 
-        // Involuntário
         $inv = (int)$pdo->query("
             SELECT COUNT(*)
             FROM `$tabela`
@@ -773,7 +703,6 @@ function calcularHeadcountAreaVinculo(PDO $pdo): array
         'julho','agosto','setembro','outubro','novembro','dezembro'
     ];
 
-    // Localizar tabelas existentes
     $tabelas = [];
     $stmt = $pdo->query("SHOW TABLES");
     while ($t = $stmt->fetchColumn()) {
@@ -784,16 +713,13 @@ function calcularHeadcountAreaVinculo(PDO $pdo): array
 
     usort($tabelas, fn($a,$b)=>array_search($a,$ordemMeses) <=> array_search($b,$ordemMeses));
 
-    $labels = [];          // Diretoria
-    $vinculos = [];        // Conjunto de vínculos existentes
-    $dados = [];           // datasets por vínculo
+    $labels = [];          
+    $vinculos = [];        
+    $dados = [];          
 
-    // Coletar todas as diretorias existentes no sistema
     $todasDiretorias = [];
 
     foreach ($tabelas as $tabela) {
-
-        // Buscar apenas ativos no mês
         $res = $pdo->query("
             SELECT diretoria, vinculo, COUNT(*) AS total
             FROM `$tabela`
@@ -811,20 +737,16 @@ function calcularHeadcountAreaVinculo(PDO $pdo): array
         }
     }
 
-    // Ordenar listas
     $diretoriasOrdenadas = array_keys($todasDiretorias);
     sort($diretoriasOrdenadas, SORT_NATURAL | SORT_FLAG_CASE);
 
     $vinculosOrdenados = array_keys($vinculos);
     sort($vinculosOrdenados, SORT_NATURAL | SORT_FLAG_CASE);
 
-    // Inicializar datasets
     foreach ($vinculosOrdenados as $vin) {
         $dados[$vin] = array_fill(0, count($diretoriasOrdenadas), 0);
     }
 
-    // Preencher valores mês atual (último mês disponível)
-    // Caso desejar usar algum mês específico, adapto facilmente.
     $tabelaAtual = end($tabelas);
 
     $res = $pdo->query("
@@ -844,7 +766,6 @@ function calcularHeadcountAreaVinculo(PDO $pdo): array
         $dados[$vin][$indexDir] = $total;
     }
 
-    // Preparar datasets finais
     $datasets = [];
     $cores = ['#1374a5','#ff7900','#23a550','#032e44','#d97706','#6b7280','#991b1b','#1e3a8a'];
 
@@ -871,7 +792,6 @@ function calcularAdmitidosEDesligados(PDO $pdo): array
         'julho','agosto','setembro','outubro','novembro','dezembro'
     ];
 
-    // Localizar tabelas válidas
     $tabelas = [];
     $stmt = $pdo->query("SHOW TABLES");
     while ($t = $stmt->fetchColumn()) {
@@ -888,11 +808,7 @@ function calcularAdmitidosEDesligados(PDO $pdo): array
 
     foreach ($tabelas as $tabela) {
 
-        // Nome do mês para exibição
         $labels[] = ucfirst($tabela);
-
-        // 🟢 ADMITIDOS DO MÊS
-        // Contar pessoas cuja data de admissão cai dentro do mês da tabela
         $numMes = array_search($tabela, $ordemMeses) + 1;
         $ano = date('Y');
 
@@ -910,8 +826,6 @@ function calcularAdmitidosEDesligados(PDO $pdo): array
                     AND STR_TO_DATE('$fimMes', '%Y-%m-%d')
         ")->fetchColumn();
 
-        // 🔴 DESLIGADOS DO MÊS
-        // Aqui usamos statusmes = desligado pois a tabela já é separada por mês
         $desl = (int)$pdo->query("
             SELECT COUNT(*)
             FROM `$tabela`
@@ -946,10 +860,6 @@ function calcularAdmitidosEDesligados(PDO $pdo): array
         ]
     ];
 }
-
-
-
-
 
 if (!function_exists('gerarDados')) {
     function gerarDados(PDO $pdo, string $campo, array $filtros, string $tipoCalculo = 'quantidade'): array

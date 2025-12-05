@@ -142,7 +142,6 @@ function gerarDadosStackedVinculoPorDiretoria($pdo, $filtros)
 
     $labels = array_keys($resultado);
 
-    // Normalizar categorias (CLT, PJ, Estágio, etc.)
     $tiposVinculo = [];
     foreach ($resultado as $dir => $tipos) {
         foreach ($tipos as $v => $t) {

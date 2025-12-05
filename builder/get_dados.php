@@ -13,17 +13,25 @@ function logDebug($msg)
 $tabela = $_GET['tabela'] ?? '';
 $x = $_GET['x'] ?? '';
 $y = $_GET['y'] ?? '';
+$dataset = $_GET['dataset'] ?? '';
+
 $campoCond = $_GET['campoCond'] ?? '';
-$tipoCond = $_GET['tipoCond'] ?? '';
+$tipoCond  = $_GET['tipoCond'] ?? '';
 $valorCond = $_GET['valorCond'] ?? '';
 
-if (!$tabela || !$x || !$y) {
-  echo json_encode([]);
+if (!$tabela || !$x || !$y || !$dataset) {
+  echo json_encode(["erro" => "Parâmetros insuficientes."]);
   exit;
 }
 
 try {
-  $amostra = $pdo->query("SELECT `$y` FROM `$tabela` WHERE `$y` IS NOT NULL AND `$y` <> '' LIMIT 10")->fetchAll(PDO::FETCH_COLUMN);
+  // Detectar se Y é numérico
+  $amostra = $pdo->query("
+    SELECT `$y` FROM `$tabela` 
+    WHERE `$y` IS NOT NULL AND `$y` <> '' 
+    LIMIT 10
+  ")->fetchAll(PDO::FETCH_COLUMN);
+
   $isNumeric = true;
   foreach ($amostra as $val) {
     if (!is_numeric(str_replace(',', '.', $val))) {
@@ -32,6 +40,9 @@ try {
     }
   }
 
+  // ============================
+  // MONTAGEM DE FILTROS
+  // ============================
   $where = [];
   $params = [];
 
@@ -41,18 +52,22 @@ try {
         $where[] = "`$campoCond` LIKE :valor";
         $params[':valor'] = "%$valorCond%";
         break;
+
       case 'igual':
         $where[] = "`$campoCond` = :valor";
         $params[':valor'] = $valorCond;
         break;
+
       case 'maior':
         $where[] = "CAST(`$campoCond` AS DECIMAL(10,2)) > :valor";
         $params[':valor'] = $valorCond;
         break;
+
       case 'menor':
         $where[] = "CAST(`$campoCond` AS DECIMAL(10,2)) < :valor";
         $params[':valor'] = $valorCond;
         break;
+
       case 'diferente':
         $where[] = "`$campoCond` <> :valor";
         $params[':valor'] = $valorCond;
@@ -60,39 +75,66 @@ try {
     }
   }
 
-  $whereSQL = $where ? "WHERE " . implode(" AND ", $where) : "";
+  $whereSQL = $where ? ("WHERE " . implode(" AND ", $where)) : "";
 
+  // ============================
+  // QUERY PRINCIPAL
+  // ============================
+
+  // Se é numérico -> média dos valores
   if ($isNumeric) {
-    $sql = "SELECT `$x` AS x,
-                 AVG(CAST(
-                   REPLACE(
-                     REPLACE(
-                       REPLACE(
-                         REPLACE(`$y`, 'R$', ''),
-                       ',', '.'),
-                     ' ', ''),
-                   '.', '') AS DECIMAL(10,2))
-                 ) AS y
-          FROM `$tabela`
-          $whereSQL
-          GROUP BY `$x`
-          ORDER BY `$x`";
+    $yExpr = "AVG(CAST(REPLACE(REPLACE(REPLACE(REPLACE(`$y`, 'R$', ''), ' ', ''), ',', '.'), '.', '') AS DECIMAL(10,2)))";
   } else {
-    $sql = "SELECT `$x` AS x, COUNT(`$y`) AS y
-          FROM `$tabela`
-          $whereSQL
-          GROUP BY `$x`
-          ORDER BY `$x`";
+    // Se não numérico -> contagem por dataset
+    $yExpr = "COUNT(`$y`)";
   }
+
+  $sql = "
+    SELECT 
+      `$x` AS eixoX,
+      `$dataset` AS ds,
+      $yExpr AS valor
+    FROM `$tabela`
+    $whereSQL
+    GROUP BY `$x`, `$dataset`
+    ORDER BY `$x`
+  ";
 
   $stmt = $pdo->prepare($sql);
   foreach ($params as $k => $v) {
     $stmt->bindValue($k, $v);
   }
   $stmt->execute();
-  $dados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-  echo json_encode($dados);
+  // ============================
+  // GERAR labels e datasets
+  // ============================
+  $labels = array_values(array_unique(array_column($rows, 'eixoX')));
+  $datasetNomes = array_values(array_unique(array_column($rows, 'ds')));
+
+  $datasets = [];
+
+  foreach ($datasetNomes as $dsNome) {
+    $data = [];
+    foreach ($labels as $label) {
+      $match = array_filter($rows, fn($r) => $r['eixoX'] == $label && $r['ds'] == $dsNome);
+      $value = $match ? floatval(array_values($match)[0]['valor']) : 0;
+      $data[] = $value;
+    }
+
+    $datasets[] = [
+      "label" => $dsNome ?: "Sem valor",
+      "data"  => $data
+    ];
+  }
+
+  echo json_encode([
+    "labels"   => $labels,
+    "datasets" => $datasets
+  ], JSON_UNESCAPED_UNICODE);
+
 } catch (Exception $e) {
-  echo json_encode([]);
+  logDebug("ERRO: " . $e->getMessage());
+  echo json_encode(["erro" => "Falha interna"]);
 }
